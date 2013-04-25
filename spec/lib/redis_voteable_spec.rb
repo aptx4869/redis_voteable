@@ -67,7 +67,7 @@ describe "Redis Voteable" do
     @voteable.up_percentage.should == 50.0
     @voteable.down_percentage.should == 50.0
   end
-  
+
   it "voteable should calculate lower Wilson confidence bound" do
     @voter2 = VoterModel.create(:name => "Voter 2")
     @voter3 = VoterModel.create(:name => "Voter 3")
@@ -121,7 +121,7 @@ describe "Redis Voteable" do
       @voteable.tally.should == -1
       @voter.up_votes.should == 0
       @voter.down_votes.should == 1
-      
+
       @voter.up_vote(@voteable)
       @voteable.up_votes.should == 1
       @voteable.down_votes.should == 0
@@ -194,7 +194,7 @@ describe "Redis Voteable" do
       @voteable.tally.should == 1
       @voter.up_votes.should == 1
       @voter.down_votes.should == 0
-      
+
       @voter.down_vote(@voteable)
       @voteable.up_votes.should == 0
       @voteable.down_votes.should == 1
@@ -239,7 +239,7 @@ describe "Redis Voteable" do
       @voteable.up_votes.should == 0
       @voter.up_votes.should == 0
     end
-    
+
     it "should have working aliases" do
       @voter.up_vote(@voteable)
       @voteable.up_votes.should == 1

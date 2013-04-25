@@ -5,7 +5,7 @@ require 'logger'
 require 'rspec'
 require 'active_record'
 require 'database_cleaner'
- 
+
 $LOAD_PATH.unshift(File.dirname(__FILE__) + '/../lib')
 require 'redis_voteable'
 
