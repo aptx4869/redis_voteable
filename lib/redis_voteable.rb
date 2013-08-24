@@ -15,10 +15,10 @@ module RedisVoteable
 
   mattr_accessor :redis_voteable_settings
   @@redis_voteable_settings = {
-        :host => 'localhost',
-        :port => '6379',
-        :db => 0,
-        :key_prefix => 'vote:',
+        host: 'localhost',
+        port: '6379',
+        db: 0,
+        key_prefix: 'vote:',
   }
 
   def redis_voteable_settings=(new_settings)

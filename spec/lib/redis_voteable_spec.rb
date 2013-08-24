@@ -3,8 +3,8 @@ require File.expand_path('../../spec_helper', __FILE__)
 
 describe "Redis Voteable" do
   before(:each) do
-    @voteable = VoteableModel.create(:name => "Votable 1")
-    @voter = VoterModel.create(:name => "Voter 1")
+    @voteable = VoteableModel.create(name: "Votable 1")
+    @voter = VoterModel.create(name: "Voter 1")
   end
 
   it "should create a voteable instance" do
@@ -62,16 +62,16 @@ describe "Redis Voteable" do
     @voter.up_vote(@voteable)
     @voteable.up_percentage.should == 100.0
     @voteable.down_percentage.should == 0.0
-    @voter2 = VoterModel.create(:name => "Voter 2")
+    @voter2 = VoterModel.create(name: "Voter 2")
     @voter2.down_vote(@voteable)
     @voteable.up_percentage.should == 50.0
     @voteable.down_percentage.should == 50.0
   end
 
   it "voteable should calculate lower Wilson confidence bound" do
-    @voter2 = VoterModel.create(:name => "Voter 2")
-    @voter3 = VoterModel.create(:name => "Voter 3")
-    @voter4 = VoterModel.create(:name => "Voter 4")
+    @voter2 = VoterModel.create(name: "Voter 2")
+    @voter3 = VoterModel.create(name: "Voter 3")
+    @voter4 = VoterModel.create(name: "Voter 4")
     @voter.up_vote(@voteable)
     score1 = @voteable.confidence
     @voter2.down_vote(@voteable)
@@ -131,7 +131,7 @@ describe "Redis Voteable" do
     end
 
     it "should allow up votes from different voters" do
-      @voter2 = VoterModel.create(:name => "Voter 2")
+      @voter2 = VoterModel.create(name: "Voter 2")
       @voter.up_vote(@voteable)
       @voter2.up_vote(@voteable)
       @voteable.up_votes.should == 2
@@ -204,7 +204,7 @@ describe "Redis Voteable" do
     end
 
     it "should allow down votes from different voters" do
-      @voter2 = VoterModel.create(:name => "Voter 2")
+      @voter2 = VoterModel.create(name: "Voter 2")
       @voter.down_vote(@voteable)
       @voter2.down_vote(@voteable)
       @voteable.down_votes.should == 2
