@@ -68,45 +68,6 @@ module RedisVoteable
       redis.sismember prefixed("#{class_key(voter)}:#{DOWN_VOTES}"), "#{class_key(self)}"
     end
 
-
-    # Returns an array of objects that are +voter+s that voted on this
-    # +voteable+. This method can be very slow, as it constructs each
-    # object. Also, it assumes that each object has a +find(id)+ method
-    # defined (e.g., any ActiveRecord object).
-    def voters
-      up_voters | down_voters
-    end
-
-    def up_voters
-      voters = redis.smembers prefixed("#{class_key(self)}:#{UP_VOTERS}")
-      voters.map do |voter|
-        tmp = voter.split(':')
-        klass = tmp[0, tmp.length-1].join(':').constantize
-        if klass.respond_to?('find')
-          klass.find(tmp.last)
-        elsif klass.respond_to?('get')
-          klass.get(tmp.last)
-        else
-          nil
-        end
-      end
-    end
-
-    def down_voters
-      voters = redis.smembers prefixed("#{class_key(self)}:#{DOWN_VOTERS}")
-      voters.map do |voter|
-        tmp = voter.split(':')
-        klass = tmp[0, tmp.length-1].join(':').constantize
-        if klass.respond_to?('find')
-          klass.find(tmp.last)
-        elsif klass.respond_to?('get')
-          klass.get(tmp.last)
-        else
-          nil
-        end
-      end
-    end
-
     # Calculates the (lower) bound of the Wilson confidence interval
     # See: http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval
     # and: http://www.evanmiller.org/how-not-to-sort-by-average-rating.html

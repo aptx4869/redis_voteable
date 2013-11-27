@@ -15,27 +15,15 @@ module RedisVoteable
       end
     end
 
-    def vote(voteable, direction)
-      if direction == :up
-        up_vote(voteable)
-      elsif direction == :down
-        down_vote(voteable)
-      end
-    end
-
-    def vote!(voteable, direction)
-      if direction == :up
-        up_vote!(voteable)
-      elsif direction == :down
-        down_vote!(voteable)
-      end
-    end
-
     # Up vote a +voteable+.
     # Raises an AlreadyVotedError if the voter already up voted the voteable.
     # Changes a down vote to an up vote if the the voter already down voted the voteable.
     def up_vote(voteable)
       check_voteable(voteable)
+      # Up/Down vote a +voteable+.
+      # Raises an AlreadyVotedError if the voter already up/down voted the voteable.
+      # Changes an up vote to a down vote if the the voter already up voted the voteable.
+      # Changes an down vote to a up vote if the the voter already down voted the voteable.
 
       r = redis.multi do
         redis.srem prefixed("#{class_key(voteable)}:#{DOWN_VOTERS}"), "#{class_key(self)}"
@@ -45,17 +33,6 @@ module RedisVoteable
       end
       raise Exceptions::AlreadyVotedError.new(true) unless r[2]
       true
-    end
-
-    # Up votes the +voteable+, but doesn't raise an error if the votelable was already up voted.
-    # The vote is simply ignored then.
-    def up_vote!(voteable)
-      begin
-        up_vote(voteable)
-        return true
-      rescue
-        return false
-      end
     end
 
     # Down vote a +voteable+.
@@ -74,14 +51,17 @@ module RedisVoteable
       true
     end
 
-    # Down votes the +voteable+, but doesn't raise an error if the votelable was already down voted.
-    # The vote is simply ignored then.
-    def down_vote!(voteable)
-      begin
-        down_vote(voteable)
-        return true
-      rescue
-        return false
+    [:up_vote, :down_vote].each do |_method|
+      # Up/Down votes the +voteable+, but doesn't raise an error if the votelable was already up/down voted.
+      # The vote is simply ignored then.
+
+      define_method "#{_method}!".to_sym do |voteable|
+        begin
+          self.send _method, voteable
+          return true
+        rescue Exceptions::AlreadyVotedError
+          return false
+        end
       end
     end
 
@@ -148,44 +128,6 @@ module RedisVoteable
     # Returns true if the voter down voted the +voteable+.
     def down_voted?(voteable)
       redis.sismember prefixed("#{class_key(voteable)}:#{DOWN_VOTERS}"), "#{class_key(self)}"
-    end
-
-    # Returns an array of objects that are +voter+s that voted on this
-    # +voteable+. This method can be very slow, as it constructs each
-    # object. Also, it assumes that each object has a +find(id)+ method
-    # defined (e.g., any ActiveRecord object).
-    def voteables
-      up_voteables | down_voteables
-    end
-
-    def up_voteables
-      voteables = redis.smembers prefixed("#{class_key(self)}:#{UP_VOTES}")
-      voteables.map do |voteable|
-        tmp = voteable.split(':')
-        klass = tmp[0, tmp.length-1].join(':').constantize
-        if klass.respond_to?('find')
-          klass.find(tmp.last)
-        elsif klass.respond_to?('get')
-          klass.get(tmp.last)
-        else
-          nil
-        end
-      end
-    end
-
-    def down_voteables
-      voteables = redis.smembers prefixed("#{class_key(self)}:#{DOWN_VOTES}")
-      voteables.map do |voteable|
-        tmp = voteable.split(':')
-        klass = tmp[0, tmp.length-1].join(':').constantize
-        if klass.respond_to?('find')
-          klass.find(tmp.last)
-        elsif klass.respond_to?('get')
-          klass.get(tmp.last)
-        else
-          nil
-        end
-      end
     end
 
     private
