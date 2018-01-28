@@ -1,3 +1,11 @@
+adapter:  sqlite3
+default: &default
+  adapter:  sqlite3
+  encoding: unicode
+  database: tmp/redis_voteable.sqlite3
 sqlite3:
   adapter: sqlite3
-  database: redis_voteable.sqlite3
+  database: tmp/redis_voteable.sqlite3
+
+development:
+  <<: *default

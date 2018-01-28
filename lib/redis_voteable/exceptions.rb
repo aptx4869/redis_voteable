@@ -1,3 +1,6 @@
+# encoding:utf-8
+# frozen_string_literal: true
+
 module RedisVoteable
   module Exceptions
     class AlreadyVotedError < StandardError
@@ -5,9 +8,9 @@ module RedisVoteable
 
       def initialize(up_vote)
         vote = if up_vote
-                 "up voted"
+                 'up voted'
                else
-                 "down voted"
+                 'down voted'
                end
 
         super "The voteable was already #{vote} by the voter."
@@ -16,13 +19,13 @@ module RedisVoteable
 
     class NotVotedError < StandardError
       def initialize
-        super "The voteable was not voted by the voter."
+        super 'The voteable was not voted by the voter.'
       end
     end
 
     class InvalidVoteableError < StandardError
       def initialize
-        super "Invalid voteable."
+        super 'Invalid voteable.'
       end
     end
   end
